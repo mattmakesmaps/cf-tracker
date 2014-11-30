@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Sheetsee Table Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'></script>
+    <!--<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900,400italic|Source+Code+Pro:400' rel='stylesheet' type='text/css'>-->
+    <script type='text/javascript' src='js/tabletop.js'></script>
+    <script type='text/javascript' src='js/sheetsee.js'></script>
+    <link rel='stylesheet' type='text/css' href='css/sss.css'>
+  </head>
+
+  <style>
+    /*#Pagination {border-top: 4px solid #CCF4FF; margin: 10px 0px; padding-top: 10px; display: inline-block;}*/
+    /*#Pagination a {cursor: pointer;}*/
+    /*.no-pag {color: #acacac; border: none;}*/
+    /*.no-pag:hover {color: #acacac;}*/
+    input {border: none; border-bottom: 1px solid #333;margin: 10px 0px; width: 200px; font-size: 16px; padding-bottom: 6px;}
+    /*.tHeader {padding: 8px; cursor: pointer; text-align: left;}*/
+    #lineChart {height: 300px; max-width: 600px;}
+    .axis {shape-rendering: crispEdges;}
+    .x.axis .minor, .y.axis .minor {stroke-opacity: .5;}
+    .x.axis {stroke-opacity: 1;}
+    .y.axis line, .y.axis path {fill: none; stroke: #acacac; stroke-width: 1;}
+    .bigg {-webkit-transition: all .2s ease-in-out; -webkit-transform: scale(2);}
+    path.chartLine {stroke: #333; stroke-width: 3; fill: none;}
+    div.tooltip {position: absolute; text-align: left; padding: 4px 8px; width: auto; font-size: 10px; height: auto; background: #fff; border: 0px; pointer-events: none;}
+    circle {fill: #e6e6e6;}
+  </style>
+
+  <body>
+      <div class="container">
+        <div id="lineChart"></div>
+        <h1>All The Lifts</h1>
+        <input id="fullTableFilter" type="text" placeholder="filter by..">
+        <div id="fullTable"></div>
+        <div id="notesDisplay"></div>
+      </div>
+
+<script id="fullTable_template" type="text/html">
+  <table>
+    <tr>
+        <th class="tHeader">Date</th>
+        <th class="tHeader">Movement</th>
+        <th class="tHeader">Weight (KG)</th>
+        <th class="tHeader">PR</th>
+    </tr>
+      {{#rows}}
+        <tr>
+            <td>{{date}}</td>
+            <td>{{movement}}</td>
+            <td>{{weightkg}}</td>
+            <td>{{pr}}</td>
+        </tr>
+      {{/rows}}
+  </table>
+</script>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+      var URL = "13C8ZxRoVam5a7fYddnlCmRinc3U7j8gaLHgs6ElkGnQ";
+      Tabletop.init(
+              {
+                  key: URL,
+                  callback: showInfo,
+                  simpleSheet: true,
+                  parseNumbers: true,
+                  postProcess: function(element) {
+                      element["timestamp"] = Date.parse(element["date"])
+                  }
+              }
+      );
+  });
+
+
+  function showInfo(data) {
+      console.log(data);
+
+      var tableOptions = {
+          "data": data,
+          "pagination": 10,
+          "tableDiv": "#fullTable",
+          "filterDiv": "#fullTableFilter"
+      };
+      Sheetsee.makeTable(tableOptions);
+      Sheetsee.initiateTableFilter(tableOptions);
+
+      var lineOptions = {
+          labels: "timestamp",
+          units: "weightkg",
+          m: [50, 50, 50, 50],
+          w: 600,
+          h: 300,
+          div: "#lineChart",
+          hiColor: "#14ECC8"};
+      Sheetsee.d3LineChart(data, lineOptions);
+
+      var fullTable = document.getElementById("fullTable");
+      fullTable.addEventListener("click", function(evt){
+          // Contents of clicked cell
+          var filter_text = evt.target.innerText;
+
+          // The non-jQuery way to nuke div contents
+          // http://stackoverflow.com/questions/5057759/how-do-i-clear-the-contents-of-a-div-without-innerhtml
+          var chart_div = document.getElementById("lineChart");
+          while (chart_div.hasChildNodes()) {
+              chart_div.removeChild(chart_div.firstChild);
+          }
+
+          var clicked_data = Sheetsee.getMatches(data, filter_text, "movement");
+          var lineOptions = {
+              labels: "timestamp",
+              units: "weightkg",
+              m: [50, 100, 100, 50],
+              w: 600,
+              h: 300,
+              div: "#lineChart",
+              hiColor: "#14ECC8"};
+          Sheetsee.d3LineChart(clicked_data, lineOptions);
+      }, false);
+
+  }
+</script>
+
+</body>
+</html>
