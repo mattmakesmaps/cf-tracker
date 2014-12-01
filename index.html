@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset='utf-8'>
-    <title>Sheetsee Table Demo</title>
+    <title>CF-Tracker</title>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
     <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'></script>
     <script type='text/javascript' src='js/tabletop.js'></script>
@@ -28,10 +28,10 @@
         <h2>Data Table</h2>
         <input id="fullTableFilter" type="text" placeholder="filter by..">
         <div id="fullTable"></div>
-        <h2>Movement Notes</h2>
-        <div id="notesDisplay"></div>
         <h2>Movement Stats</h2>
         <div id="statsDisplay"></div>
+          <h2>Movement Notes</h2>
+          <div id="notesDisplay"></div>
       </div>
 
       <script id="notesDisplay" type="text/html">
@@ -44,25 +44,31 @@
           </ul>
       </script>
 
-<script id="fullTable" type="text/html">
-  <table>
-    <tr>
-        <th class="tHeader">Date</th>
-        <th class="tHeader">Movement</th>
-        <th class="tHeader">Weight (KG)</th>
-        <th class="tHeader">PR</th>
-    </tr>
-      {{#rows}}
-        <tr>
-            <td>{{date}}</td>
-            <td>{{movement}}</td>
-            <td>{{weightkg}}</td>
-            <td>{{pr}}</td>
-        </tr>
-      {{/rows}}
-  </table>
-</script>
+    <script id="statsDisplay" type="text/html">
+        <ul>
+            <li><b>Max Weight:</b> {{max}}</li>
+            <li><b>Number of Entries:</b> {{count}}</li>
+        </ul>
+    </script>
 
+    <script id="fullTable" type="text/html">
+      <table>
+        <tr>
+            <th class="tHeader">Date</th>
+            <th class="tHeader">Movement</th>
+            <th class="tHeader">Weight (KG)</th>
+            <th class="tHeader">PR</th>
+        </tr>
+          {{#rows}}
+            <tr>
+                <td>{{date}}</td>
+                <td>{{movement}}</td>
+                <td>{{weightkg}}</td>
+                <td>{{pr}}</td>
+            </tr>
+          {{/rows}}
+      </table>
+    </script>
 
 <script type="text/javascript">
   // Using jQuery DOM Ready Format
@@ -82,7 +88,6 @@
   });
 
   function showInfo(data) {
-
       // Populate the Data Table
       var tableOptions = {
           "data": data,
@@ -102,25 +107,18 @@
           h: 300,
           div: "#lineChart",
           hiColor: "#14ECC8"};
-      Sheetsee.d3LineChart(data, lineOptions);
 
       // User Clicks a Table Cell
       var fullTable = document.getElementById("fullTable");
       fullTable.addEventListener("click", function(evt){
-          // Contents of clicked cell
-          var filter_text = evt.target.innerText;
+          // For a click on any cell in row, get the movement name.
+          var selected_movement = evt.target.parentNode.children[1].innerText;
           // All records for the movement a user clicked.
-          var clicked_data = Sheetsee.getMatches(data, filter_text, "movement");
+          var clicked_data = Sheetsee.getMatches(data, selected_movement, "movement");
 
-          // The non-jQuery way to nuke div contents
-          // http://stackoverflow.com/questions/5057759/how-do-i-clear-the-contents-of-a-div-without-innerhtml
-          var chart_div = document.getElementById("lineChart");
-          while (chart_div.hasChildNodes()) {
-              chart_div.removeChild(chart_div.firstChild);
-          }
-          // Replace the chart
+          // Update the chart
+          $('#lineChart').empty();
           Sheetsee.d3LineChart(clicked_data, lineOptions);
-
 
           // Update Notes List. Note we're using ich built with
           // Sheetsee, as opposed to a separate ich lib.
@@ -129,6 +127,14 @@
               rows: clicked_data
           });
           $('#notesDisplay').html(notes_html);
+
+          // Update Stats List
+          var stats_html;
+          stats_html = Sheetsee.ich.statsDisplay({
+              max: Sheetsee.getMax(clicked_data, "weightkg")[0]["weightkg"],
+              count: clicked_data.length
+          });
+          $('#statsDisplay').html(stats_html);
       }, false);
 
   }
