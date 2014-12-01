@@ -27,7 +27,7 @@
         <div id="lineChart"></div>
         <h2>Data Table</h2>
         <input id="fullTableFilter" type="text" placeholder="filter by..">
-        <div id="fullTable"></div>
+        <div id="fullTableDiv"></div>
         <h2>Movement Stats</h2>
         <div id="statsDisplay"></div>
           <h2>Movement Notes</h2>
@@ -51,8 +51,8 @@
         </ul>
     </script>
 
-    <script id="fullTable" type="text/html">
-      <table>
+    <script id="fullTableDiv" type="text/html">
+      <table id="fullTable">
         <tr>
             <th class="tHeader">Date</th>
             <th class="tHeader">Movement</th>
@@ -92,7 +92,7 @@
       var tableOptions = {
           "data": data,
           "pagination": 10,
-          "tableDiv": "#fullTable",
+          "tableDiv": "#fullTableDiv",
           "filterDiv": "#fullTableFilter"
       };
       Sheetsee.makeTable(tableOptions);
