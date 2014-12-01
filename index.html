@@ -63,7 +63,7 @@
             <tr>
                 <td>{{date}}</td>
                 <td>{{movement}}</td>
-                <td>{{weightkg}}</td>
+                <td>{{weight}}</td>
                 <td>{{pr}}</td>
             </tr>
           {{/rows}}
@@ -101,7 +101,7 @@
       // Create the Initial Line Chart
       var lineOptions = {
           labels: "timestamp",
-          units: "weightkg",
+          units: "weight",
           m: [50, 50, 50, 50],
           w: 600,
           h: 300,
@@ -131,7 +131,7 @@
           // Update Stats List
           var stats_html;
           stats_html = Sheetsee.ich.statsDisplay({
-              max: Sheetsee.getMax(clicked_data, "weightkg")[0]["weightkg"],
+              max: Sheetsee.getMax(clicked_data, "weight")[0]["weight"],
               count: clicked_data.length
           });
           $('#statsDisplay').html(stats_html);
