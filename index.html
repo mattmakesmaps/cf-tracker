@@ -27,7 +27,7 @@
         <div id="lineChart"></div>
         <h2>Data Table</h2>
         <input id="fullTableFilter" type="text" placeholder="filter by..">
-        <div id="fullTableDiv"></div>
+        <div id="fullTable"></div>
         <h2>Movement Stats</h2>
         <div id="statsDisplay"></div>
           <h2>Movement Notes</h2>
@@ -51,8 +51,8 @@
         </ul>
     </script>
 
-    <script id="fullTableDiv" type="text/html">
-      <table id="fullTable">
+    <script id="fullTable" type="text/html">
+      <table>
         <tr>
             <th class="tHeader">Date</th>
             <th class="tHeader">Movement</th>
@@ -92,7 +92,7 @@
       var tableOptions = {
           "data": data,
           "pagination": 10,
-          "tableDiv": "#fullTableDiv",
+          "tableDiv": "#fullTable",
           "filterDiv": "#fullTableFilter"
       };
       Sheetsee.makeTable(tableOptions);
@@ -130,8 +130,15 @@
 
           // Update Stats List
           var stats_html;
+          var max_weight;
+          if (clicked_data[0]) {
+              max_weight = Sheetsee.getMax(clicked_data, "weight")[0]["weight"] || "No Data (Empty String)";
+          }
+          else {
+              max_weight = "No Data (No Property)";
+          }
           stats_html = Sheetsee.ich.statsDisplay({
-              max: Sheetsee.getMax(clicked_data, "weight")[0]["weight"],
+              max: max_weight,
               count: clicked_data.length
           });
           $('#statsDisplay').html(stats_html);
