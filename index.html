@@ -112,7 +112,7 @@
       var fullTable = document.getElementById("fullTable");
       fullTable.addEventListener("click", function(evt){
           // For a click on any cell in row, get the movement name.
-          var selected_movement = evt.target.parentNode.children[1].innerText;
+          var selected_movement = evt.target.parentNode.children[1].innerHtml;
           // All records for the movement a user clicked.
           var clicked_data = Sheetsee.getMatches(data, selected_movement, "movement");
 
